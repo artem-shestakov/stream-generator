@@ -1,0 +1,286 @@
+---
+- name: Installing Nginx proxy
+  hosts: proxy
+  remote_user: artem.shestakov@sys.local
+  become: true
+  roles:
+    - role: artem_shestakov.nginx
+      vars:
+        - install_from: source
+        # - stub_status: true
+        # - stub_status_settings:
+        #     listen: 0.0.0.0:80
+        - nginx_with_modules:
+            - --with-file-aio
+            - --with-ipv6
+            - --with-http_ssl_module
+            - --with-http_v2_module
+            - --with-http_realip_module
+            - --with-http_addition_module
+            - --with-http_xslt_module=dynamic
+            - --with-http_image_filter_module=dynamic
+            - --with-http_sub_module
+            - --with-http_dav_module
+            - --with-http_flv_module
+            - --with-http_mp4_module
+            - --with-http_gunzip_module
+            - --with-http_gzip_static_module
+            - --with-http_random_index_module
+            - --with-http_secure_link_module
+            - --with-http_degradation_module
+            - --with-http_slice_module
+            - --with-http_stub_status_module
+            - --with-http_perl_module=dynamic
+            - --with-http_auth_request_module
+            - --with-mail=dynamic
+            - --with-mail_ssl_module
+            - --with-stream
+            - --with-stream_ssl_module
+            - --with-debug
+        - nginx_add_modules:
+            - https://github.com/vozlt/nginx-module-vts.git
+            - https://github.com/vozlt/nginx-module-stream-sts.git
+            - https://github.com/vozlt/nginx-module-sts.git
+        - nginx_http_add:
+            - vhost_traffic_status_zone;
+            - stream_server_traffic_status_zone;
+        - nginx_stream_add:
+            - server_traffic_status_zone;
+        - nginx_virtual_servers:
+            - listen: 8080
+              locations:
+                - location: /streams-status
+                  params:
+                    - stream_server_traffic_status_display;
+                    - stream_server_traffic_status_display_format html;
+                - location: /http-status
+                  params:
+                    - vhost_traffic_status_display;
+                    - vhost_traffic_status_display_format html;
+        - tcp_udp_nlb:
+            - name: 80
+              listen:
+                - 10.242.27.164:80
+                - 10.242.27.165:80
+              servers:
+                - 10.242.11.104:80
+                - 10.242.11.105:80
+            - name: 443
+              listen:
+                - 10.242.27.164:443
+                - 10.242.27.165:443
+              servers:
+                - 10.242.11.104:443
+                - 10.242.11.105:443
+            - name: 10001
+              listen:
+                - 10.242.27.164:10001
+                - 10.242.27.165:10001
+              servers:
+                - 10.242.3.150:12105
+            - name: 10002
+              listen:
+                - 10.242.27.164:10002
+                - 10.242.27.165:10002
+              servers:
+                - 10.160.2.58:1443
+            - name: 10003
+              listen:
+                - 10.242.27.164:10003
+                - 10.242.27.165:10003
+              servers:
+                - 10.160.2.58:443
+            - name: 10004
+              listen:
+                - 10.242.27.164:10004
+                - 10.242.27.165:10004
+              servers:
+                - 10.2.110.56:80
+            - name: 10005
+              listen:
+                - 10.242.27.164:10005
+                - 10.242.27.165:10005
+              servers:
+                - 10.2.110.56:80
+            - name: 10006
+              listen:
+                - 10.242.27.164:10006
+                - 10.242.27.165:10006
+              servers:
+                - 10.2.110.50:80
+            - name: 10007
+              listen:
+                - 10.242.27.164:10007
+                - 10.242.27.165:10007
+              servers:
+                - 10.2.110.50:80
+            - name: 10008
+              listen:
+                - 10.242.27.164:10008
+                - 10.242.27.165:10008
+              servers:
+                - 10.42.94.8:80
+            - name: 10009
+              listen:
+                - 10.242.27.164:10009
+                - 10.242.27.165:10009
+              servers:
+                - 10.42.94.8:443
+            - name: 10010
+              listen:
+                - 10.242.27.164:10010
+                - 10.242.27.165:10010
+              servers:
+                - 10.242.8.219:443
+            - name: 10011
+              listen:
+                - 10.242.27.164:10011
+                - 10.242.27.165:10011
+              servers:
+                - 10.242.8.4:443
+            - name: 10012
+              listen:
+                - 10.242.27.164:10012
+                - 10.242.27.165:10012
+              servers:
+                - 10.242.3.180:1443
+            - name: 10013
+              listen:
+                - 10.242.27.164:10013
+                - 10.242.27.165:10013
+              servers:
+                - 10.242.3.168:1443
+            - name: 10014
+              listen:
+                - 10.242.27.164:10014
+                - 10.242.27.165:10014
+              servers:
+                - 10.242.3.142:6432
+                - 10.242.3.136:6432
+                - 10.242.3.137:6432
+            - name: 10015
+              listen:
+                - 10.242.27.164:10015
+                - 10.242.27.165:10015
+              servers:
+                - 10.184.86.19:80
+            - name: 10016
+              listen:
+                - 10.242.27.164:10016
+                - 10.242.27.165:10016
+              servers:
+                - 10.184.86.19:443
+            - name: 10017
+              listen:
+                - 10.242.27.164:10017
+                - 10.242.27.165:10017
+              servers:
+                - 10.184.86.130:80
+            - name: 10018
+              listen:
+                - 10.242.27.164:10018
+                - 10.242.27.165:10018
+              servers:
+                - 10.184.86.130:443
+            - name: 10019
+              listen:
+                - 10.242.27.164:10019
+                - 10.242.27.165:10019
+              servers:
+                - 10.31.70.181:7099
+            - name: 10020
+              listen:
+                - 10.242.27.164:10020
+                - 10.242.27.165:10020
+              servers:
+                - 10.31.70.120:80
+            - name: 10021
+              listen:
+                - 10.242.27.164:10021
+                - 10.242.27.165:10021
+              servers:
+                - 10.31.70.120:443
+            - name: 10022
+              listen:
+                - 10.242.27.164:10022
+                - 10.242.27.165:10022
+              servers:
+                - 10.28.101.120:80
+            - name: 10023
+              listen:
+                - 10.242.27.164:10023
+                - 10.242.27.165:10023
+              servers:
+                - 10.28.101.120:443
+            - name: 10024
+              listen:
+                - 10.242.27.164:10024
+                - 10.242.27.165:10024
+              servers:
+                - 10.28.88.16:80
+            - name: 10025
+              listen:
+                - 10.242.27.164:10025
+                - 10.242.27.165:10025
+              servers:
+                - 10.28.88.16:443
+            - name: 10026
+              listen:
+                - 10.242.27.164:10026
+                - 10.242.27.165:10026
+              servers:
+                - 10.29.6.40:9608
+            - name: 10027
+              listen:
+                - 10.242.27.164:10027
+                - 10.242.27.165:10027
+              servers:
+                - 10.36.138.57:20110
+            - name: 10028
+              listen:
+                - 10.242.27.164:10028
+                - 10.242.27.165:10028
+              servers:
+                - 10.200.2.47:8008
+            - name: 10029
+              listen:
+                - 10.242.27.164:10029
+                - 10.242.27.165:10029
+              servers:
+                - 10.143.81.139:18443
+            - name: 10030
+              listen:
+                - 10.242.27.164:10030
+                - 10.242.27.165:10030
+              servers:
+                - 10.144.196.205:8445
+            - name: 10031
+              listen:
+                - 10.242.27.164:10031
+                - 10.242.27.165:10031
+              servers:
+                - 10.160.16.97:8843
+            - name: 10032
+              listen:
+                - 10.242.27.164:10032
+                - 10.242.27.165:10032
+              servers:
+                - 10.42.86.208:80
+            - name: 10033
+              listen:
+                - 10.242.27.164:10033
+                - 10.242.27.165:10033
+              servers:
+                - 10.42.86.208:443
+            - name: 10034
+              listen:
+                - 10.242.27.164:10034
+                - 10.242.27.165:10034
+              servers:
+                - 10.184.86.18:80
+            - name: 10035
+              listen:
+                - 10.242.27.164:10035
+                - 10.242.27.165:10035
+              servers:
+                - 10.184.86.18:443
