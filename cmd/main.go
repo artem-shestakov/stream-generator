@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -70,11 +72,38 @@ func writeFile(streams *models.Streams) error {
 	return nil
 }
 
-func main() {
-	f := readXlsx("streams.xlsx")
-	streams := createStreams(f)
-	err := writeFile(streams)
+func readYaml(file string) []models.Playbook {
+	var playbooks []models.Playbook
+	yamlFile, err := ioutil.ReadFile(file)
 	if err != nil {
-		fmt.Printf("Error to write file %s", err)
+		log.Fatal(err)
 	}
+
+	err = yaml.Unmarshal(yamlFile, &playbooks)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return playbooks
+}
+
+func test(t interface{}) {
+	switch reflect.TypeOf(t).Kind() {
+	case reflect.Slice:
+		s := reflect.ValueOf(t)
+		for i := 0; i < s.Len(); i++ {
+			fmt.Println(s.Index(i))
+		}
+	}
+}
+
+func main() {
+	// f := readXlsx("streams.xlsx")
+	// streams := createStreams(f)
+	// err := writeFile(streams)
+	// if err != nil {
+	// 	fmt.Printf("Error to write file %s", err)
+	// }
+	playbooks := readYaml("./example/example.yml")
+	test(playbooks[0].Roles[0].Vars["tcp_udp_nlb"])
 }

@@ -6,11 +6,11 @@
   roles:
     - role: artem_shestakov.nginx
       vars:
-        - install_from: source
+        install_from: source
         # - stub_status: true
         # - stub_status_settings:
         #     listen: 0.0.0.0:80
-        - nginx_with_modules:
+        nginx_with_modules:
             - --with-file-aio
             - --with-ipv6
             - --with-http_ssl_module
@@ -37,16 +37,16 @@
             - --with-stream
             - --with-stream_ssl_module
             - --with-debug
-        - nginx_add_modules:
+        nginx_add_modules:
             - https://github.com/vozlt/nginx-module-vts.git
             - https://github.com/vozlt/nginx-module-stream-sts.git
             - https://github.com/vozlt/nginx-module-sts.git
-        - nginx_http_add:
+        nginx_http_add:
             - vhost_traffic_status_zone;
             - stream_server_traffic_status_zone;
-        - nginx_stream_add:
+        nginx_stream_add:
             - server_traffic_status_zone;
-        - nginx_virtual_servers:
+        nginx_virtual_servers:
             - listen: 8080
               locations:
                 - location: /streams-status
@@ -57,7 +57,7 @@
                   params:
                     - vhost_traffic_status_display;
                     - vhost_traffic_status_display_format html;
-        - tcp_udp_nlb:
+        tcp_udp_nlb:
             - name: 80
               listen:
                 - 10.242.27.164:80
